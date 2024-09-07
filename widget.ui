@@ -482,23 +482,30 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <property name="geometry">
     <rect>
      <x>530</x>
-     <y>20</y>
+     <y>10</y>
      <width>381</width>
-     <height>81</height>
+     <height>101</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_6">
     <item>
-     <widget class="QLabel" name="weatherstatusLabel">
+     <widget class="QLabel" name="weatherinfoLabel">
       <property name="text">
        <string>天气如何？</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QLabel" name="weatherinfoLabel">
+     <widget class="QLabel" name="airinfoLabel">
       <property name="text">
-       <string>Weather</string>
+       <string>空气如何？</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="raininfoLabel">
+      <property name="text">
+       <string>降水提示？</string>
       </property>
      </widget>
     </item>

@@ -19,9 +19,9 @@ Widget::Widget(QWidget *parent)
 
 	timer3 = new QTimer;
 	connect(timer3, &QTimer::timeout, this, &Widget::timer3Update);
-	timer3->start(60 * 60 * SECOND);
+    timer3->start(10 * 60 * SECOND);
 
-	// QCalenderWidget
+    // QCalenderWidget
 	ui->calendarWidget->setFirstDayOfWeek(Qt::Sunday);
 	calendarSetToday();
 
@@ -44,6 +44,8 @@ Widget::Widget(QWidget *parent)
 
 	// Weather
 	weatherRequire();
+	rainRequire();
+	airRequire();
 }
 
 Widget::~Widget() {
@@ -157,18 +159,38 @@ void Widget::handleTcp30520Recive() {
 	s->write("Recieved");
 }
 /** @brief 处理TCP30521接收 */
-void Widget::handleTcp30521Recive() {
-	QString msg = weatherSocket->readAll();
+void Widget::handleTcp30521ReciveWeather()
+{
+    QString msg = weatherSocket->readAll();
+    qDebug() << "[INFO] Tcp Recieve: " + msg;
+    QStringList weatherList = msg.split(" ");
+    QString weatherType = weatherList[0];
+    QString temperature = weatherList[1];
+    QString wind = weatherList[2];
+    int weatherCode = weatherList[3].toInt();
+    weatherImgUpdate(weatherCode);
+    QString weatherMsg = weatherType + "  " + temperature + "  " + wind;
+    ui->weatherinfoLabel->setText(weatherMsg);
+    weatherSocket->disconnectFromHost();
+}
+/** @brief 处理TCP30521接收 */
+void Widget::handleTcp30521ReciveRain()
+{
+	QString msg = rainSocket->readAll();
 	qDebug() << "[INFO] Tcp Recieve: " + msg;
-	QStringList weatherList = msg.split(" ");
-	QString location = weatherList[0];
-	QString weatherType = weatherList[1];
-	int temperature = weatherList[2].toInt();
-	int weatherCode = weatherList[3].toInt();
-	weatherImgUpdate(weatherCode);
-	QString weatherMsg = location + "  " + weatherType + "  " + QString::number(temperature) + "°C";
-	ui->weatherinfoLabel->setText(weatherMsg);
-	weatherSocket->disconnectFromHost();
+	ui->raininfoLabel->setText(msg);
+	rainSocket->disconnectFromHost();
+}
+/** @brief 处理TCP30521接收 */
+void Widget::handleTcp30521ReciveAir()
+{
+	QString msg = airSocket->readAll();
+	qDebug() << "[INFO] Tcp Recieve: " + msg;
+	QStringList airList = msg.split(" ");
+	QString airQuality = airList[0];
+	int airAQI = airList[1].toInt();
+    ui->airinfoLabel->setText("空气质量：" + airQuality + "  AQI：" + QString::number(airAQI));
+    airSocket->disconnectFromHost();
 }
 
 // Process
@@ -220,59 +242,50 @@ void Widget::displayText() {
 /** @brief 请求天气 */
 void Widget::weatherRequire() {
 	weatherSocket = new QTcpSocket;
-	weatherSocket->connectToHost(QHostAddress("192.168.31.159"), 30521);
-	connect(weatherSocket, &QTcpSocket::readyRead, this, &Widget::handleTcp30521Recive);
-	weatherSocket->write(QString("weather").toUtf8());
-	qDebug() << "[INFO] Weather required!";
+    weatherSocket->connectToHost(QHostAddress(WEATHERSERVERIP), 30521);
+    connect(weatherSocket, &QTcpSocket::readyRead, this, &Widget::handleTcp30521ReciveWeather);
+    weatherSocket->write(QString("weather").toUtf8());
+    qDebug() << "[INFO] Weather required!";
 }
-/** @brief 更新天气图片和提示语 */
+/** @brief 请求雨情 */
+void Widget::rainRequire()
+{
+	rainSocket = new QTcpSocket;
+	rainSocket->connectToHost(QHostAddress(WEATHERSERVERIP), 30521);
+	connect(rainSocket, &QTcpSocket::readyRead, this, &Widget::handleTcp30521ReciveRain);
+	rainSocket->write(QString("rain").toUtf8());
+	qDebug() << "[INFO] Rain required!";
+}
+/** @brief 请求空气质量 */
+void Widget::airRequire()
+{
+	airSocket = new QTcpSocket;
+	airSocket->connectToHost(QHostAddress(WEATHERSERVERIP), 30521);
+	connect(airSocket, &QTcpSocket::readyRead, this, &Widget::handleTcp30521ReciveAir);
+	airSocket->write(QString("air").toUtf8());
+	qDebug() << "[INFO] Air required!";
+}
+/** @brief 更新天气图片 */
 void Widget::weatherImgUpdate(int code) {
-	QString path = QDir::cleanPath(QCoreApplication::applicationDirPath() + QDir::separator()
-		                               + QString("/weather_imgs/") + QString::number(code)
-		                               + QString("@2x.png"));
-	QPixmap img(path);
-	ui->weatherimgLabel->setPixmap(img);
-	ui->weatherimgLabel->show();
+    QString path = QDir::cleanPath(QCoreApplication::applicationDirPath() + QDir::separator()
+                                   + QString("/weather_icons/") + QString::number(code)
+                                   + QString("-fill.svg"));
+    QPixmap img(path);
+    ui->weatherimgLabel->setPixmap(img.scaled(ui->weatherimgLabel->size()));
+    ui->weatherimgLabel->show();
 
-	if (code <= 10) {
-		ui->weatherstatusLabel->setText("天气不错！");
-	}
-	else if (code <= 14) {
-		ui->weatherstatusLabel->setText("今天有雨，记得带伞");
-	}
-	else if (code <= 18) {
-		ui->weatherstatusLabel->setText("雨很大，注意安全");
-	}
-	else if (code <= 20) {
-		ui->weatherstatusLabel->setText("雨雪交加，注意防滑保暖");
-	}
-	else if (code <= 23) {
-		ui->weatherstatusLabel->setText("今天有雪，记得穿暖和");
-	}
-	else if (code <= 25) {
-		ui->weatherstatusLabel->setText("雪很大，注意安全");
-	}
-	else if (code <= 29) {
-		ui->weatherstatusLabel->setText("扬尘天气，记得戴口罩");
-	}
-	else if (code <= 31) {
-		ui->weatherstatusLabel->setText("雾霾天气，注意防护");
-	}
-	else if (code <= 33) {
-		ui->weatherstatusLabel->setText("今天有风");
-	}
-	else if (code <= 36) {
-		ui->weatherstatusLabel->setText("风很大，注意安全");
-	}
-	else if (code <= 37) {
-		ui->weatherstatusLabel->setText("今天冷，记得穿暖和");
-	}
-	else if (code <= 39) {
-		ui->weatherstatusLabel->setText("今天热，注意防晒");
-	}
-	else {
-		ui->weatherstatusLabel->setText("未知天气");
-	}
+    // QString svg_path = QSvgRenderer svg_remder(folder_icon_path);
+    // QSize label_size = ui->label->size(); //取控件的大小即可
+    // QImage image(QSize(label_size.width() * g_fGlobalDPI, label_size.height() * g_fGlobalDPI),
+    //              QImage::Format_ARGB32_Premultiplied);
+    // 输出的img一定要是拉伸dpi倍数之后尺寸 img.fill(Qt::transparent);
+    // QPainter painter(&image);
+    // painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing
+    //                        | QPainter::SmoothPixmapTransform);
+    // svg_remder.render(&painter);
+    // QPixmap pix;
+    // pix = pix.fromImage(image);
+    // pix.setDevicePixelRatio(g_fGlobalDPI);
 }
 
 // Other Functions

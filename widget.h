@@ -8,6 +8,7 @@
 #include <QNetworkRequest>
 #include <QProcess>
 #include <QStringList>
+#include <QSvgRenderer>
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QTextBrowser>
@@ -16,6 +17,10 @@
 #include <QWidget>
 
 #define SECOND 1 * 1000
+#define MINUTE 60 * SECOND
+#define HOUR 60 * MINUTE
+
+#define WEATHERSERVERIP "127.0.0.1"
 
 #define OS_WIN 1
 #define OS_LINUX 2
@@ -44,7 +49,9 @@ private slots:
     // Slots of TcpServer
     void acceptTcp30520();
     void handleTcp30520Recive();
-    void handleTcp30521Recive();
+    void handleTcp30521ReciveWeather();
+    void handleTcp30521ReciveRain();
+	void handleTcp30521ReciveAir();
 
     // Slots of Timer
     void timer1Update();
@@ -63,6 +70,8 @@ private:
     QTcpServer *server;
     QTcpSocket *socket;
     QTcpSocket *weatherSocket;
+    QTcpSocket *rainSocket;
+	QTcpSocket *airSocket;
     QProcess *cmdTemp;
     QProcess *cmdLoad;
 
@@ -79,6 +88,8 @@ private:
     void displayTemp(char OS_TYPE);
     void displayLoad(char OS_TYPE);
     void weatherRequire();
+    void rainRequire();
+	void airRequire();
     void weatherImgUpdate(int code);
     void runShell(QProcess *cmd, char OS_TYPE, QString command);
 };
