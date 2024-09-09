@@ -63,11 +63,6 @@ Widget::~Widget() {
 }
 
 // Button Events
-/** @brief 关闭按钮 */
-void Widget::on_pushButton_clicked() {
-	this->close();
-}
-
 /** @brief 今天按钮 */
 void Widget::on_todayButton_clicked() {
 	calendarSetToday();
@@ -75,8 +70,12 @@ void Widget::on_todayButton_clicked() {
 
 /** @brief 刷新按钮 */
 void Widget::on_refreshButton_clicked() {
-	// displayText();
-	weatherRequire();
+    ui->weatherinfoLabel->setText("Refreshing...");
+    ui->airInfoLabel->clear();
+    ui->raininfoLabel->clear();
+    weatherRequire();
+    rainRequire();
+    airRequire();
 }
 
 // Timer Events
@@ -92,7 +91,9 @@ void Widget::timer2Update() {
 }
 /** @brief 定时器3槽函数 更新天气 */
 void Widget::timer3Update() {
-	weatherRequire();
+    weatherRequire();
+    rainRequire();
+    airRequire();
 }
 
 /** @brief 更新显示时间 */
@@ -136,9 +137,6 @@ void Widget::displayLoad(char OS_TYPE) {
 void Widget::acceptTcp30520() {
 	QTcpSocket *socket = server->nextPendingConnection();
 	connect(socket, &QTcpSocket::readyRead, this, &Widget::handleTcp30520Recive);
-	// 获取客户端信息
-	// socket->peerAddress();
-	// socket->peerPort();
 	if (socket->peerAddress().toString() == "127.0.0.1") {
 		ui->clientinfoLabel->setText("From Web  "
 			                             // + ":" + QString::number(socket->peerPort())
@@ -166,10 +164,11 @@ void Widget::handleTcp30521ReciveWeather()
     QStringList weatherList = msg.split(" ");
     QString weatherType = weatherList[0];
     QString temperature = weatherList[1];
-    QString wind = weatherList[2];
-    int weatherCode = weatherList[3].toInt();
+    QString humidity = weatherList[2];
+    QString wind = weatherList[3];
+    int weatherCode = weatherList[4].toInt();
     weatherImgUpdate(weatherCode);
-    QString weatherMsg = weatherType + "  " + temperature + "  " + wind;
+    QString weatherMsg = weatherType + "  " + temperature + "  " + humidity + "  " + wind;
     ui->weatherinfoLabel->setText(weatherMsg);
     weatherSocket->disconnectFromHost();
 }
@@ -178,8 +177,8 @@ void Widget::handleTcp30521ReciveRain()
 {
 	QString msg = rainSocket->readAll();
 	qDebug() << "[INFO] Tcp Recieve: " + msg;
-	ui->raininfoLabel->setText(msg);
-	rainSocket->disconnectFromHost();
+    ui->raininfoLabel->setText(msg.left(msg.size() - 1));
+    rainSocket->disconnectFromHost();
 }
 /** @brief 处理TCP30521接收 */
 void Widget::handleTcp30521ReciveAir()
@@ -189,7 +188,14 @@ void Widget::handleTcp30521ReciveAir()
 	QStringList airList = msg.split(" ");
 	QString airQuality = airList[0];
 	int airAQI = airList[1].toInt();
-    ui->airinfoLabel->setText("空气质量：" + airQuality + "  AQI：" + QString::number(airAQI));
+    QString primary = airList[2];
+    if (primary == "NA") {
+        ui->airInfoLabel->setText("空气" + airQuality + "  享受空气吧" + "  AQI "
+                                  + QString::number(airAQI));
+    } else {
+        ui->airInfoLabel->setText("空气" + airQuality + "  主要为" + primary + "  AQI "
+                                  + QString::number(airAQI));
+    }
     airSocket->disconnectFromHost();
 }
 
@@ -270,22 +276,29 @@ void Widget::weatherImgUpdate(int code) {
     QString path = QDir::cleanPath(QCoreApplication::applicationDirPath() + QDir::separator()
                                    + QString("/weather_icons/") + QString::number(code)
                                    + QString("-fill.svg"));
-    QPixmap img(path);
-    ui->weatherimgLabel->setPixmap(img.scaled(ui->weatherimgLabel->size()));
-    ui->weatherimgLabel->show();
+    ui->weatherimgLabel->clear();
+    // 获取当前的布局
+    QLayout *layout = ui->weatherimgLabel->layout();
 
-    // QString svg_path = QSvgRenderer svg_remder(folder_icon_path);
-    // QSize label_size = ui->label->size(); //取控件的大小即可
-    // QImage image(QSize(label_size.width() * g_fGlobalDPI, label_size.height() * g_fGlobalDPI),
-    //              QImage::Format_ARGB32_Premultiplied);
-    // 输出的img一定要是拉伸dpi倍数之后尺寸 img.fill(Qt::transparent);
-    // QPainter painter(&image);
-    // painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing
-    //                        | QPainter::SmoothPixmapTransform);
-    // svg_remder.render(&painter);
-    // QPixmap pix;
-    // pix = pix.fromImage(image);
-    // pix.setDevicePixelRatio(g_fGlobalDPI);
+    // 如果没有布局，则创建一个新的QHBoxLayout
+    if (!layout) {
+        layout = new QHBoxLayout(ui->weatherimgLabel);
+        layout->setContentsMargins(0, 0, 0, 0); // 设置边距为0
+    }
+
+    // 清除之前的QSvgWidget
+    QLayoutItem *child;
+    while ((child = layout->takeAt(0)) != nullptr) {
+        delete child->widget(); // 删除布局项中的widget
+        delete child;           // 删除布局项
+    }
+
+    // 创建新的QSvgWidget
+    QSvgWidget *svg = new QSvgWidget(path);
+    svg->setFixedSize(ui->weatherimgLabel->size());
+    layout->addWidget(svg);
+
+    svg->show();
 }
 
 // Other Functions

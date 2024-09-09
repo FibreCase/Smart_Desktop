@@ -3,16 +3,22 @@
 
 #include <QDebug>
 #include <QFileDialog>
+#include <QGraphicsScene>
+#include <QGraphicsSvgItem>
+#include <QGraphicsView>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QProcess>
+#include <QRegExp>
 #include <QStringList>
 #include <QSvgRenderer>
+#include <QSvgWidget>
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QTextBrowser>
 #include <QTextStream>
+#include <QThread>
 #include <QTimer>
 #include <QWidget>
 
@@ -42,7 +48,6 @@ public:
 
 private slots:
     // Slots of Button
-    void on_pushButton_clicked();
     void on_todayButton_clicked();
     void on_refreshButton_clicked();
 
