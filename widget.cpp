@@ -9,9 +9,9 @@ Widget::Widget(QWidget *parent)
 	ui->displayLabel->setText("Big Brother is watching you.");
 
 	// QTimer
-	timer1 = new QTimer;
-	connect(timer1, &QTimer::timeout, this, &Widget::timer1Update);
-	timer1->start(SECOND);
+    timer1 = new QTimer;
+    connect(timer1, &QTimer::timeout, this, &Widget::timer1Update);
+    timer1->start(SECOND);
 
 	timer2 = new QTimer;
 	connect(timer2, &QTimer::timeout, this, &Widget::timer2Update);
@@ -19,7 +19,7 @@ Widget::Widget(QWidget *parent)
 
 	timer3 = new QTimer;
 	connect(timer3, &QTimer::timeout, this, &Widget::timer3Update);
-    timer3->start(10 * 60 * SECOND);
+    timer3->start(5 * MINUTE);
 
     // QCalenderWidget
 	ui->calendarWidget->setFirstDayOfWeek(Qt::Sunday);
@@ -29,23 +29,28 @@ Widget::Widget(QWidget *parent)
 	setStyleSheet(QString("QTabBar::tab{height:40;width:%1}").arg(ui->tabWidget->width() / 3));
 
 	// QTcpServer
-	server = new QTcpServer;
-	server->listen(QHostAddress("0.0.0.0"), 30520);
-	connect(server, &QTcpServer::newConnection, this, &Widget::acceptTcp30520);
+    server30520 = new QTcpServer;
+    server30520->listen(QHostAddress("0.0.0.0"), 30520);
+    connect(server30520, &QTcpServer::newConnection, this, &Widget::acceptTcp30520);
 
-	// QProcess
-	cmdTemp = new QProcess;
-	connect(cmdTemp, &QProcess::readyReadStandardOutput, this, &Widget::tempReadoutput);
-	cmdLoad = new QProcess;
-	connect(cmdLoad, &QProcess::readyReadStandardOutput, this, &Widget::loadReadoutput);
+    server30522 = new QTcpServer;
+    server30522->listen(QHostAddress("0.0.0.0"), 30522);
+    connect(server30522, &QTcpServer::newConnection, this, &Widget::acceptTcp30522);
 
-	// QTextBrowser
-	ui->htmlBrowser->setOpenExternalLinks(true);
+    // QProcess
+    cmdTemp = new QProcess;
+    connect(cmdTemp, &QProcess::readyReadStandardOutput, this, &Widget::tempReadoutput);
+    cmdLoad = new QProcess;
+    connect(cmdLoad, &QProcess::readyReadStandardOutput, this, &Widget::loadReadoutput);
 
 	// Weather
-	weatherRequire();
-	rainRequire();
-	airRequire();
+    weatherTimerCount = 0;
+    weatherRequire();
+    rainRequire();
+    airRequire();
+
+    // Messager Image
+    setDefaultImg();
 }
 
 Widget::~Widget() {
@@ -77,6 +82,13 @@ void Widget::on_refreshButton_clicked() {
     rainRequire();
     airRequire();
 }
+void Widget::on_vwButton_clicked()
+{
+    VideoWidget *vw;
+    vw = new VideoWidget(nullptr, this);
+    vw->show();
+    this->hide();
+}
 
 // Timer Events
 /** @brief 定时器1槽函数 更新时间 */
@@ -90,12 +102,22 @@ void Widget::timer2Update() {
 	displayLoad(divideOS());
 }
 /** @brief 定时器3槽函数 更新天气 */
-void Widget::timer3Update() {
-    weatherRequire();
+void Widget::timer3Update()
+{
     rainRequire();
-    airRequire();
+    if (++weatherTimerCount % 2 == 0) {
+        weatherRequire();
+    }
+    if (weatherTimerCount % 5 == 0) {
+        airRequire();
+        calendarSetToday();
+    }
+    if (weatherTimerCount == 10) {
+        weatherTimerCount = 0;
+    }
 }
 
+// UI Events
 /** @brief 更新显示时间 */
 void Widget::updateTime() {
 	// 获取当前时间并转换为字符串
@@ -105,7 +127,6 @@ void Widget::updateTime() {
 	ui->timeLabel->setText(currentTime);
 	ui->dateLabel->setText(currentDate);
 }
-
 /** @brief 显示温度 */
 void Widget::displayTemp(char OS_TYPE) {
 	switch (OS_TYPE) {
@@ -117,7 +138,6 @@ void Widget::displayTemp(char OS_TYPE) {
 	}
 	ui->lcdNumber->display((int)cpuTemp);
 }
-
 /** @brief 显示负载 */
 void Widget::displayLoad(char OS_TYPE) {
 	switch (OS_TYPE) {
@@ -131,54 +151,76 @@ void Widget::displayLoad(char OS_TYPE) {
 	}
 	ui->cpuloadLabel->setText(loadDisplayText);
 }
+/** @brief 设置消息图片 */
+void Widget::setMessagerImg(QPixmap pixmap) {
+	// 按 QLabel 的尺寸缩放 pixmap，并保持宽高比
+	QPixmap scaledPixmap = pixmap.scaled(ui->msgImgLabel->size(),
+	                                     Qt::KeepAspectRatio,
+	                                     Qt::SmoothTransformation);
 
-// Network Events
-/** @brief 接受TCP连接 */
-void Widget::acceptTcp30520() {
-	QTcpSocket *socket = server->nextPendingConnection();
-	connect(socket, &QTcpSocket::readyRead, this, &Widget::handleTcp30520Recive);
-	if (socket->peerAddress().toString() == "127.0.0.1") {
-		ui->clientinfoLabel->setText("From Web  "
-			                             // + ":" + QString::number(socket->peerPort())
-			                             + QDateTime::currentDateTime().toString("HH:mm:ss"));
-	}
-	else {
-		ui->clientinfoLabel->setText("From "
-			                             + socket->peerAddress().toString()
-				                             // + ":" + QString::number(socket->peerPort())
-			                             + "  " + QDateTime::currentDateTime().toString("HH:mm:ss"));
-	}
+	// 将缩放后的 pixmap 设置到 QLabel
+	ui->msgImgLabel->setPixmap(scaledPixmap);
+	ui->msgImgLabel->setAlignment(Qt::AlignCenter);
+}
+/** @brief 设置默认图片 */
+void Widget::setDefaultImg() {
+    QString imgPath = QCoreApplication::applicationDirPath() + QDir::separator()
+                      + QString("default.png");
+    setMessagerImg(QPixmap(imgPath));
+}
+/** @brief 设置日历为今天 */
+void Widget::calendarSetToday() {
+	ui->calendarWidget->setSelectedDate(QDate::currentDate());
 }
 
-/** @brief 处理TCP接收 */
-void Widget::handleTcp30520Recive() {
-	QTcpSocket *s = (QTcpSocket *)sender();
+// Network Events
+// TcpServer: 30520 - Neko Messager
+/** @brief 接受TCP30520连接 */
+void Widget::acceptTcp30520() {
+    QTcpSocket *socket = server30520->nextPendingConnection();
+    connect(socket, &QTcpSocket::readyRead, this, &Widget::handleTcp30520Recive);
+    if (socket->peerAddress().toString() == "127.0.0.1") {
+        ui->clientinfoLabel->setText("From Web  "
+                                     // + ":" + QString::number(socket->peerPort())
+                                     + QDateTime::currentDateTime().toString("HH:mm:ss"));
+    } else {
+        ui->clientinfoLabel->setText("From "
+                                     + socket->peerAddress().toString()
+                                     // + ":" + QString::number(socket->peerPort())
+                                     + "  " + QDateTime::currentDateTime().toString("HH:mm:ss"));
+    }
+}
+/** @brief 处理TCP30520接收 */
+void Widget::handleTcp30520Recive()
+{
+    QTcpSocket *s = (QTcpSocket *)sender();
 	ui->displayLabel->setText(QString(s->readAll()));
 	s->write("Recieved");
 }
+// TcpClient: 30521 - Weather Server
 /** @brief 处理TCP30521接收 */
 void Widget::handleTcp30521ReciveWeather()
 {
-    QString msg = weatherSocket->readAll();
-    qDebug() << "[INFO] Tcp Recieve: " + msg;
-    QStringList weatherList = msg.split(" ");
-    QString weatherType = weatherList[0];
-    QString temperature = weatherList[1];
-    QString humidity = weatherList[2];
-    QString wind = weatherList[3];
-    int weatherCode = weatherList[4].toInt();
-    weatherImgUpdate(weatherCode);
-    QString weatherMsg = weatherType + "  " + temperature + "  " + humidity + "  " + wind;
-    ui->weatherinfoLabel->setText(weatherMsg);
-    weatherSocket->disconnectFromHost();
+	QString msg = weatherSocket->readAll();
+	qDebug() << "[INFO] Tcp Recieve: " + msg;
+	QStringList weatherList = msg.split(" ");
+	QString weatherType = weatherList[0];
+	QString temperature = weatherList[1];
+	QString humidity = weatherList[2];
+	QString wind = weatherList[3];
+	int weatherCode = weatherList[4].toInt();
+	weatherImgUpdate(weatherCode);
+	QString weatherMsg = weatherType + "  " + temperature + "  " + humidity + "  " + wind;
+	ui->weatherinfoLabel->setText(weatherMsg);
+	weatherSocket->disconnectFromHost();
 }
 /** @brief 处理TCP30521接收 */
 void Widget::handleTcp30521ReciveRain()
 {
 	QString msg = rainSocket->readAll();
 	qDebug() << "[INFO] Tcp Recieve: " + msg;
-    ui->raininfoLabel->setText(msg.left(msg.size() - 1));
-    rainSocket->disconnectFromHost();
+	ui->raininfoLabel->setText(msg.left(msg.size() - 1));
+	rainSocket->disconnectFromHost();
 }
 /** @brief 处理TCP30521接收 */
 void Widget::handleTcp30521ReciveAir()
@@ -188,15 +230,56 @@ void Widget::handleTcp30521ReciveAir()
 	QStringList airList = msg.split(" ");
 	QString airQuality = airList[0];
 	int airAQI = airList[1].toInt();
-    QString primary = airList[2];
-    if (primary == "NA") {
-        ui->airInfoLabel->setText("空气" + airQuality + "  享受空气吧" + "  AQI "
-                                  + QString::number(airAQI));
-    } else {
-        ui->airInfoLabel->setText("空气" + airQuality + "  主要为" + primary + "  AQI "
-                                  + QString::number(airAQI));
+	QString primary = airList[2];
+	if (primary == "NA") {
+		ui->airInfoLabel->setText("空气" + airQuality + "  AQI " + QString::number(airAQI));
+	} else {
+		ui->airInfoLabel->setText("空气" + airQuality + "  主要为" + primary + "  AQI "
+			                          + QString::number(airAQI));
+	}
+	airSocket->disconnectFromHost();
+}
+// TcpServer: 30522 - Neko Messager Image
+/** @brief 接受TCP30522连接 */
+void Widget::acceptTcp30522()
+{
+    QTcpSocket *socket = server30522->nextPendingConnection();
+    connect(socket, &QTcpSocket::readyRead, this, &Widget::handleTcp30522Recive);
+    imageBuffer.clear();
+    imageSize = 0;
+    qDebug() << "New Connection. ";
+}
+/** @brief 处理TCP30522接收 */
+void Widget::handleTcp30522Recive()
+{
+    QTcpSocket *s = (QTcpSocket *) sender();
+    if (imageSize == 0) {
+        // 首先获取图片大小信息（假设客户端先发送图片大小）
+        if (s->bytesAvailable() < sizeof(qint64)) {
+            return; // 如果数据不足够读取图片大小，则等待更多数据
+        }
+        s->read(reinterpret_cast<char *>(&imageSize), sizeof(qint64)); // 读取图片大小
     }
-    airSocket->disconnectFromHost();
+
+    // 将接收到的数据追加到缓冲区
+    imageBuffer.append(s->readAll());
+
+    // 检查是否接收到了完整的图片
+    if (imageBuffer.size() >= imageSize) {
+        QImage image;
+        image.loadFromData(imageBuffer); // 从缓冲区数据中加载图片
+
+        if (!image.isNull()) {
+            // 将 QImage 转换为 QPixmap
+            QPixmap pixmap = QPixmap::fromImage(image);
+	        setMessagerImg(pixmap);
+        } else {
+            qDebug() << "Failed to load image from data.";
+        }
+
+        imageBuffer.clear(); // 清空缓冲区，为接收下一张图片做准备
+        imageSize = 0;       // 重置图片大小
+    }
 }
 
 // Process
@@ -212,7 +295,6 @@ void Widget::loadReadoutput() {
 	cpuLoad1 = list[1].toDouble();
 	cpuLoad2 = list[2].toDouble();
 }
-
 /** @brief 运行Shell命令 */
 void Widget::runShell(QProcess *cmd, char OS_TYPE, QString command) {
 	switch (OS_TYPE) {
@@ -228,20 +310,6 @@ void Widget::runShell(QProcess *cmd, char OS_TYPE, QString command) {
 	cmd->waitForReadyRead();
 	cmd->close();
 	cmd->waitForFinished();
-}
-
-// TextBrowser
-/** @brief 显示文本 */
-void Widget::displayText() {
-	const QString qstr_file_name = QFileDialog::getOpenFileName(this,
-	                                                            "选择HTML文件",
-	                                                            "",
-	                                                            "HTML Files (*.html)");
-	if (qstr_file_name.isEmpty()) {
-		return;
-	}
-	ui->htmlBrowser->clear();
-	ui->htmlBrowser->setSource(QUrl::fromLocalFile(qstr_file_name));
 }
 
 // Weather
@@ -313,9 +381,4 @@ char Widget::divideOS() {
 #ifdef Q_OS_MAC
 	return OS_MAC;
 #endif
-}
-
-/** @brief 设置日历为今天 */
-void Widget::calendarSetToday() {
-	ui->calendarWidget->setSelectedDate(QDate::currentDate());
 }

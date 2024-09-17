@@ -12,12 +12,15 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
+    videowidget.cpp \
     widget.cpp
 
 HEADERS += \
+    videowidget.h \
     widget.h
 
 FORMS += \
+    videowidget.ui \
     widget.ui
 
 # Default rules for deployment.

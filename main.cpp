@@ -11,7 +11,8 @@ int main(int argc, char *argv[])
     // QApplication::setStyle(QStyleFactory::create("WindowsVista"));
     QApplication::setStyle(QStyleFactory::create("Fusion"));
 
-    Widget w;
-    w.show();
+    Widget *w;
+    w = new Widget();
+    w->show();
     return a.exec();
 }
