@@ -210,9 +210,11 @@ void Widget::handleTcp30521ReciveWeather()
 	QString wind = weatherList[3];
 	int weatherCode = weatherList[4].toInt();
 	weatherImgUpdate(weatherCode);
-	QString weatherMsg = weatherType + "  " + temperature + "  " + humidity + "  " + wind;
-	ui->weatherinfoLabel->setText(weatherMsg);
-	weatherSocket->disconnectFromHost();
+    QString weatherMsg = weatherType + "  " + temperature + "°C  " + humidity + "%  " + wind;
+    ui->weatherinfoLabel->setText(weatherMsg);
+    ui->humiLcdNumber->display(humidity);
+    ui->tempLcdNumber->display(temperature);
+    weatherSocket->disconnectFromHost();
 }
 /** @brief 处理TCP30521接收 */
 void Widget::handleTcp30521ReciveRain()
@@ -220,7 +222,8 @@ void Widget::handleTcp30521ReciveRain()
 	QString msg = rainSocket->readAll();
 	qDebug() << "[INFO] Tcp Recieve: " + msg;
 	ui->raininfoLabel->setText(msg.left(msg.size() - 1));
-	rainSocket->disconnectFromHost();
+    ui->raininfoLabel_2->setText(msg.left(msg.size() - 1));
+    rainSocket->disconnectFromHost();
 }
 /** @brief 处理TCP30521接收 */
 void Widget::handleTcp30521ReciveAir()
@@ -237,7 +240,8 @@ void Widget::handleTcp30521ReciveAir()
 		ui->airInfoLabel->setText("空气" + airQuality + "  主要为" + primary + "  AQI "
 			                          + QString::number(airAQI));
 	}
-	airSocket->disconnectFromHost();
+    ui->airLcdNumber->display(airList[1]);
+    airSocket->disconnectFromHost();
 }
 // TcpServer: 30522 - Neko Messager Image
 /** @brief 接受TCP30522连接 */
