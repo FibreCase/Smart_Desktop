@@ -62,6 +62,7 @@ private slots:
     void handleTcp30521ReciveWeather();
     void handleTcp30521ReciveRain();
 	void handleTcp30521ReciveAir();
+    void handleTcp30521ReciveIndoor();
 
     // Slots of Timer
     void timer1Update();
@@ -83,6 +84,7 @@ private:
     QTcpSocket *weatherSocket;
     QTcpSocket *rainSocket;
 	QTcpSocket *airSocket;
+    QTcpSocket *indoorSocket;
     QProcess *cmdTemp;
     QProcess *cmdLoad;
     QByteArray imageBuffer;
@@ -105,6 +107,7 @@ private:
     void weatherRequire();
     void rainRequire();
 	void airRequire();
+    void indoorRequire();
     void weatherImgUpdate(int code);
     void runShell(QProcess *cmd, char OS_TYPE, QString command);
 };

@@ -8,8 +8,8 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     QApplication::setOverrideCursor(Qt::BlankCursor);
-    // QApplication::setStyle(QStyleFactory::create("WindowsVista"));
-    QApplication::setStyle(QStyleFactory::create("Fusion"));
+    QApplication::setStyle(QStyleFactory::create("WindowsVista"));
+    // QApplication::setStyle(QStyleFactory::create("Fusion"));
 
     Widget *w;
     w = new Widget();

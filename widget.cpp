@@ -5,10 +5,10 @@ Widget::Widget(QWidget *parent)
 	: QWidget(parent), ui(new Ui::Widget) {
 	ui->setupUi(this);
 
-	// QLabel
-	ui->displayLabel->setText("Big Brother is watching you.");
+    // QLabel
+    ui->displayLabel->setText("Big Brother is watching you.");
 
-	// QTimer
+    // QTimer
     timer1 = new QTimer;
     connect(timer1, &QTimer::timeout, this, &Widget::timer1Update);
     timer1->start(SECOND);
@@ -45,6 +45,8 @@ Widget::Widget(QWidget *parent)
 
 	// Weather
     weatherTimerCount = 0;
+    indoorRequire();
+    QThread::msleep(200);
     weatherRequire();
     rainRequire();
     airRequire();
@@ -78,6 +80,10 @@ void Widget::on_refreshButton_clicked() {
     ui->weatherinfoLabel->setText("Refreshing...");
     ui->airInfoLabel->clear();
     ui->raininfoLabel->clear();
+
+    indoorRequire();
+    QThread::msleep(200);
+
     weatherRequire();
     rainRequire();
     airRequire();
@@ -100,6 +106,7 @@ void Widget::timer1Update() {
 void Widget::timer2Update() {
 	displayTemp(divideOS());
 	displayLoad(divideOS());
+    indoorRequire();
 }
 /** @brief 定时器3槽函数 更新天气 */
 void Widget::timer3Update()
@@ -127,7 +134,7 @@ void Widget::updateTime() {
 	ui->timeLabel->setText(currentTime);
 	ui->dateLabel->setText(currentDate);
 }
-/** @brief 显示温度 */
+/** @brief 显示CPU温度 */
 void Widget::displayTemp(char OS_TYPE) {
 	switch (OS_TYPE) {
 		case OS_WIN:cpuTemp = 55.467;
@@ -138,7 +145,7 @@ void Widget::displayTemp(char OS_TYPE) {
 	}
 	ui->lcdNumber->display((int)cpuTemp);
 }
-/** @brief 显示负载 */
+/** @brief 显示CPU负载 */
 void Widget::displayLoad(char OS_TYPE) {
 	switch (OS_TYPE) {
 		case OS_WIN:loadDisplayText = "1.23 2.46 3.69";
@@ -197,8 +204,9 @@ void Widget::handleTcp30520Recive()
 	ui->displayLabel->setText(QString(s->readAll()));
 	s->write("Recieved");
 }
+
 // TcpClient: 30521 - Weather Server
-/** @brief 处理TCP30521接收 */
+/** @brief 处理TCP30521接收天气 */
 void Widget::handleTcp30521ReciveWeather()
 {
 	QString msg = weatherSocket->readAll();
@@ -212,20 +220,46 @@ void Widget::handleTcp30521ReciveWeather()
 	weatherImgUpdate(weatherCode);
     QString weatherMsg = weatherType + "  " + temperature + "°C  " + humidity + "%  " + wind;
     ui->weatherinfoLabel->setText(weatherMsg);
+    // 湿度显示
+    if (humidity.toInt() < 40) {
+        ui->humiLcdNumber->setStyleSheet("background-color: sandybrown;");
+    } else if (humidity.toInt() > 70) {
+        ui->humiLcdNumber->setStyleSheet("background-color: turquoise;");
+    } else {
+        ui->humiLcdNumber->setStyleSheet("background-color: transparent;");
+    }
     ui->humiLcdNumber->display(humidity);
+    // 温度显示
+    if (temperature.toInt() < 0) {
+        ui->tempLcdNumber->setStyleSheet("background-color: dodgerblue;");
+    } else if (temperature.toInt() < 15) {
+        ui->tempLcdNumber->setStyleSheet("background-color: skyblue;");
+    } else if (temperature.toInt() > 35) {
+        ui->tempLcdNumber->setStyleSheet("background-color: orangered;");
+    } else if (temperature.toInt() > 25) {
+        ui->tempLcdNumber->setStyleSheet("background-color: coral;");
+    } else {
+        ui->tempLcdNumber->setStyleSheet("background-color: transparent;");
+    }
     ui->tempLcdNumber->display(temperature);
     weatherSocket->disconnectFromHost();
 }
-/** @brief 处理TCP30521接收 */
+/** @brief 处理TCP30521接收降水 */
 void Widget::handleTcp30521ReciveRain()
 {
 	QString msg = rainSocket->readAll();
 	qDebug() << "[INFO] Tcp Recieve: " + msg;
-	ui->raininfoLabel->setText(msg.left(msg.size() - 1));
+    // 降水信息显示
+    if (msg.left(msg.size() - 1) == "未来两小时无降水") {
+        ui->raininfoLabel_2->setStyleSheet("background-color: transparent;");
+    } else {
+        ui->raininfoLabel_2->setStyleSheet("background-color: gold;");
+    }
+    ui->raininfoLabel->setText(msg.left(msg.size() - 1));
     ui->raininfoLabel_2->setText(msg.left(msg.size() - 1));
     rainSocket->disconnectFromHost();
 }
-/** @brief 处理TCP30521接收 */
+/** @brief 处理TCP30521接收空气 */
 void Widget::handleTcp30521ReciveAir()
 {
 	QString msg = airSocket->readAll();
@@ -234,15 +268,60 @@ void Widget::handleTcp30521ReciveAir()
 	QString airQuality = airList[0];
 	int airAQI = airList[1].toInt();
 	QString primary = airList[2];
-	if (primary == "NA") {
-		ui->airInfoLabel->setText("空气" + airQuality + "  AQI " + QString::number(airAQI));
-	} else {
-		ui->airInfoLabel->setText("空气" + airQuality + "  主要为" + primary + "  AQI "
-			                          + QString::number(airAQI));
-	}
-    ui->airLcdNumber->display(airList[1]);
+
+    if (primary == "NA") {
+        ui->airInfoLabel->setText("空气" + airQuality + "  AQI " + QString::number(airAQI));
+    } else {
+        ui->airInfoLabel->setText("空气" + airQuality + "  主要为" + primary + "  AQI "
+                                  + QString::number(airAQI));
+    }
+    // 空气质量显示
+    if (airAQI < 50) {
+        ui->airLcdNumber->setStyleSheet("background-color: springgreen;");
+    } else if (airAQI < 100) {
+        ui->airLcdNumber->setStyleSheet("background-color: transparent;");
+    } else if (airAQI < 150) {
+        ui->airLcdNumber->setStyleSheet("background-color: orange;");
+    } else {
+        ui->airLcdNumber->setStyleSheet("background-color: orangered;");
+    }
+
+    ui->airLcdNumber->display(airAQI);
     airSocket->disconnectFromHost();
 }
+/** @brief 处理TCP30521接收室内 */
+void Widget::handleTcp30521ReciveIndoor()
+{
+    QString msg = indoorSocket->readAll();
+    qDebug() << "[INFO] Tcp Recieve: " + msg;
+    QStringList indoorList = msg.split(" ");
+    float indoorTemp = indoorList[0].toFloat();
+    int indoorHumi = indoorList[1].toInt();
+    // 室内温度显示
+    if (indoorTemp < 10) {
+        ui->inTempLcdNumber->setStyleSheet("background-color: dodgerblue;");
+    } else if (indoorTemp < 18) {
+        ui->inTempLcdNumber->setStyleSheet("background-color: skyblue;");
+    } else if (indoorTemp > 30) {
+        ui->inTempLcdNumber->setStyleSheet("background-color: orangered;");
+    } else if (indoorTemp > 23) {
+        ui->inTempLcdNumber->setStyleSheet("background-color: coral;");
+    } else {
+        ui->inTempLcdNumber->setStyleSheet("background-color: transparent;");
+    }
+    ui->inTempLcdNumber->display(indoorList[0]);
+    // 室内湿度显示
+    if (indoorHumi < 40) {
+        ui->inHumiLcdNumber->setStyleSheet("background-color: sandybrown;");
+    } else if (indoorHumi > 70) {
+        ui->inHumiLcdNumber->setStyleSheet("background-color: turquoise;");
+    } else {
+        ui->inHumiLcdNumber->setStyleSheet("background-color: transparent;");
+    }
+    ui->inHumiLcdNumber->display(indoorHumi);
+    indoorSocket->disconnectFromHost();
+}
+
 // TcpServer: 30522 - Neko Messager Image
 /** @brief 接受TCP30522连接 */
 void Widget::acceptTcp30522()
@@ -343,8 +422,18 @@ void Widget::airRequire()
 	airSocket->write(QString("air").toUtf8());
 	qDebug() << "[INFO] Air required!";
 }
+/** @brief 请求室内 */
+void Widget::indoorRequire()
+{
+    indoorSocket = new QTcpSocket;
+    indoorSocket->connectToHost(QHostAddress(WEATHERSERVERIP), 30521);
+    connect(indoorSocket, &QTcpSocket::readyRead, this, &Widget::handleTcp30521ReciveIndoor);
+    indoorSocket->write(QString("indoor").toUtf8());
+    qDebug() << "[INFO] Indoor required!";
+}
 /** @brief 更新天气图片 */
-void Widget::weatherImgUpdate(int code) {
+void Widget::weatherImgUpdate(int code)
+{
     QString path = QDir::cleanPath(QCoreApplication::applicationDirPath() + QDir::separator()
                                    + QString("/weather_icons/") + QString::number(code)
                                    + QString("-fill.svg"));

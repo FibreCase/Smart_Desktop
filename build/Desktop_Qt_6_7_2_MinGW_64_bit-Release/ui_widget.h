@@ -43,10 +43,16 @@ public:
     QLCDNumber *airLcdNumber;
     QLabel *label_7;
     QLabel *raininfoLabel_2;
+    QFrame *line_5;
+    QLabel *weatherimgLabel;
+    QFrame *line_3;
+    QLCDNumber *inTempLcdNumber;
+    QLabel *label_8;
+    QLCDNumber *inHumiLcdNumber;
+    QLabel *label_9;
+    QLabel *label_4;
     QWidget *tab_3;
     QPushButton *vwButton;
-    QFrame *line_2;
-    QLabel *label_4;
     QWidget *tab_2;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout_3;
@@ -73,7 +79,6 @@ public:
     QLabel *weatherinfoLabel;
     QLabel *airInfoLabel;
     QLabel *raininfoLabel;
-    QLabel *weatherimgLabel;
 
     void setupUi(QWidget *Widget)
     {
@@ -98,12 +103,12 @@ public:
         tab->setObjectName("tab");
         line_4 = new QFrame(tab);
         line_4->setObjectName("line_4");
-        line_4->setGeometry(QRect(0, 80, 991, 20));
+        line_4->setGeometry(QRect(400, 80, 591, 20));
         line_4->setFrameShape(QFrame::Shape::HLine);
         line_4->setFrameShadow(QFrame::Shadow::Sunken);
         verticalLayoutWidget_3 = new QWidget(tab);
         verticalLayoutWidget_3->setObjectName("verticalLayoutWidget_3");
-        verticalLayoutWidget_3->setGeometry(QRect(0, 10, 991, 71));
+        verticalLayoutWidget_3->setGeometry(QRect(400, 10, 591, 71));
         verticalLayout_5 = new QVBoxLayout(verticalLayoutWidget_3);
         verticalLayout_5->setObjectName("verticalLayout_5");
         verticalLayout_5->setContentsMargins(0, 0, 0, 0);
@@ -115,6 +120,7 @@ public:
         font1.setBold(false);
         displayLabel->setFont(font1);
         displayLabel->setAlignment(Qt::AlignmentFlag::AlignCenter);
+        displayLabel->setWordWrap(true);
 
         verticalLayout_5->addWidget(displayLabel);
 
@@ -133,76 +139,122 @@ public:
 
         msgImgLabel = new QLabel(tab);
         msgImgLabel->setObjectName("msgImgLabel");
-        msgImgLabel->setGeometry(QRect(380, 100, 611, 311));
+        msgImgLabel->setGeometry(QRect(400, 100, 591, 311));
+        msgImgLabel->setWordWrap(false);
         humiLcdNumber = new QLCDNumber(tab);
         humiLcdNumber->setObjectName("humiLcdNumber");
-        humiLcdNumber->setGeometry(QRect(0, 230, 91, 61));
+        humiLcdNumber->setGeometry(QRect(30, 120, 111, 61));
         humiLcdNumber->setLayoutDirection(Qt::LayoutDirection::LeftToRight);
+        humiLcdNumber->setFrameShape(QFrame::Shape::NoFrame);
         humiLcdNumber->setDigitCount(3);
+        humiLcdNumber->setSegmentStyle(QLCDNumber::SegmentStyle::Flat);
         humiLcdNumber->setProperty("intValue", QVariant(50));
         tempLcdNumber = new QLCDNumber(tab);
         tempLcdNumber->setObjectName("tempLcdNumber");
-        tempLcdNumber->setGeometry(QRect(0, 100, 211, 121));
+        tempLcdNumber->setGeometry(QRect(140, 10, 151, 91));
+        tempLcdNumber->setFrameShape(QFrame::Shape::NoFrame);
         tempLcdNumber->setDigitCount(3);
+        tempLcdNumber->setSegmentStyle(QLCDNumber::SegmentStyle::Flat);
         tempLcdNumber->setProperty("intValue", QVariant(16));
         refreshButton = new QPushButton(tab);
         refreshButton->setObjectName("refreshButton");
-        refreshButton->setGeometry(QRect(0, 370, 371, 51));
+        refreshButton->setGeometry(QRect(10, 360, 371, 51));
         refreshButton->setMinimumSize(QSize(0, 50));
         label_5 = new QLabel(tab);
         label_5->setObjectName("label_5");
-        label_5->setGeometry(QRect(100, 230, 41, 61));
+        label_5->setGeometry(QRect(140, 120, 51, 61));
         QFont font3;
         font3.setFamilies({QString::fromUtf8("Arial")});
         font3.setPointSize(30);
         label_5->setFont(font3);
-        label_5->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
+        label_5->setAlignment(Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter);
         label_6 = new QLabel(tab);
         label_6->setObjectName("label_6");
-        label_6->setGeometry(QRect(220, 100, 71, 121));
+        label_6->setGeometry(QRect(290, 10, 81, 91));
         QFont font4;
         font4.setFamilies({QString::fromUtf8("Arial")});
         font4.setPointSize(50);
         label_6->setFont(font4);
-        label_6->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
+        label_6->setAlignment(Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft);
         airLcdNumber = new QLCDNumber(tab);
         airLcdNumber->setObjectName("airLcdNumber");
-        airLcdNumber->setGeometry(QRect(150, 230, 91, 61));
+        airLcdNumber->setGeometry(QRect(210, 120, 111, 61));
+        airLcdNumber->setFrameShape(QFrame::Shape::NoFrame);
         airLcdNumber->setDigitCount(3);
+        airLcdNumber->setSegmentStyle(QLCDNumber::SegmentStyle::Flat);
         airLcdNumber->setProperty("intValue", QVariant(120));
         label_7 = new QLabel(tab);
         label_7->setObjectName("label_7");
-        label_7->setGeometry(QRect(250, 230, 41, 61));
-        QFont font5;
-        font5.setFamilies({QString::fromUtf8("Arial")});
-        font5.setPointSize(20);
-        label_7->setFont(font5);
-        label_7->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
+        label_7->setGeometry(QRect(320, 120, 61, 61));
+        label_7->setFont(font);
+        label_7->setAlignment(Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter);
         raininfoLabel_2 = new QLabel(tab);
         raininfoLabel_2->setObjectName("raininfoLabel_2");
-        raininfoLabel_2->setGeometry(QRect(0, 300, 371, 61));
-        raininfoLabel_2->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
+        raininfoLabel_2->setGeometry(QRect(10, 190, 371, 61));
+        raininfoLabel_2->setFont(font);
+        raininfoLabel_2->setAlignment(Qt::AlignmentFlag::AlignCenter);
+        raininfoLabel_2->setWordWrap(true);
+        line_5 = new QFrame(tab);
+        line_5->setObjectName("line_5");
+        line_5->setGeometry(QRect(10, 240, 371, 16));
+        line_5->setFrameShape(QFrame::Shape::HLine);
+        line_5->setFrameShadow(QFrame::Shadow::Sunken);
+        weatherimgLabel = new QLabel(tab);
+        weatherimgLabel->setObjectName("weatherimgLabel");
+        weatherimgLabel->setGeometry(QRect(20, 10, 81, 81));
+        line_3 = new QFrame(tab);
+        line_3->setObjectName("line_3");
+        line_3->setGeometry(QRect(7, 100, 371, 20));
+        line_3->setFrameShape(QFrame::Shape::HLine);
+        line_3->setFrameShadow(QFrame::Shadow::Sunken);
+        inTempLcdNumber = new QLCDNumber(tab);
+        inTempLcdNumber->setObjectName("inTempLcdNumber");
+        inTempLcdNumber->setGeometry(QRect(150, 260, 171, 91));
+        inTempLcdNumber->setFrameShape(QFrame::Shape::NoFrame);
+        inTempLcdNumber->setSmallDecimalPoint(true);
+        inTempLcdNumber->setDigitCount(3);
+        inTempLcdNumber->setMode(QLCDNumber::Mode::Dec);
+        inTempLcdNumber->setSegmentStyle(QLCDNumber::SegmentStyle::Flat);
+        inTempLcdNumber->setProperty("value", QVariant(20.199999999999999));
+        inTempLcdNumber->setProperty("intValue", QVariant(20));
+        label_8 = new QLabel(tab);
+        label_8->setObjectName("label_8");
+        label_8->setGeometry(QRect(320, 260, 51, 91));
+        label_8->setFont(font3);
+        label_8->setAlignment(Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter);
+        inHumiLcdNumber = new QLCDNumber(tab);
+        inHumiLcdNumber->setObjectName("inHumiLcdNumber");
+        inHumiLcdNumber->setGeometry(QRect(10, 290, 71, 61));
+        inHumiLcdNumber->setFrameShape(QFrame::Shape::NoFrame);
+        inHumiLcdNumber->setDigitCount(3);
+        inHumiLcdNumber->setSegmentStyle(QLCDNumber::SegmentStyle::Flat);
+        inHumiLcdNumber->setProperty("value", QVariant(40.000000000000000));
+        label_9 = new QLabel(tab);
+        label_9->setObjectName("label_9");
+        label_9->setGeometry(QRect(80, 290, 51, 61));
+        label_9->setFont(font3);
+        label_9->setAlignment(Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter);
+        label_4 = new QLabel(tab);
+        label_4->setObjectName("label_4");
+        label_4->setGeometry(QRect(10, 260, 121, 31));
+        QFont font5;
+        font5.setFamilies({QString::fromUtf8("Arial")});
+        font5.setPointSize(18);
+        font5.setBold(false);
+        label_4->setFont(font5);
+        label_4->setAlignment(Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter);
         tabWidget->addTab(tab, QString());
         tab_3 = new QWidget();
         tab_3->setObjectName("tab_3");
         vwButton = new QPushButton(tab_3);
         vwButton->setObjectName("vwButton");
-        vwButton->setGeometry(QRect(10, 60, 311, 61));
-        line_2 = new QFrame(tab_3);
-        line_2->setObjectName("line_2");
-        line_2->setGeometry(QRect(10, 40, 311, 16));
-        line_2->setFrameShape(QFrame::Shape::HLine);
-        line_2->setFrameShadow(QFrame::Shadow::Sunken);
-        label_4 = new QLabel(tab_3);
-        label_4->setObjectName("label_4");
-        label_4->setGeometry(QRect(10, 10, 311, 31));
-        label_4->setAlignment(Qt::AlignmentFlag::AlignCenter);
+        vwButton->setGeometry(QRect(10, 10, 311, 61));
         tabWidget->addTab(tab_3, QString());
         tab_2 = new QWidget();
         tab_2->setObjectName("tab_2");
         verticalLayoutWidget = new QWidget(tab_2);
         verticalLayoutWidget->setObjectName("verticalLayoutWidget");
-        verticalLayoutWidget->setGeometry(QRect(310, 10, 681, 401));
+        verticalLayoutWidget->setGeometry(QRect(580, 10, 411, 401));
         verticalLayout_3 = new QVBoxLayout(verticalLayoutWidget);
         verticalLayout_3->setObjectName("verticalLayout_3");
         verticalLayout_3->setContentsMargins(0, 0, 0, 0);
@@ -228,7 +280,7 @@ public:
 
         verticalLayoutWidget_2 = new QWidget(tab_2);
         verticalLayoutWidget_2->setObjectName("verticalLayoutWidget_2");
-        verticalLayoutWidget_2->setGeometry(QRect(3, 10, 291, 401));
+        verticalLayoutWidget_2->setGeometry(QRect(290, 10, 281, 401));
         verticalLayout_4 = new QVBoxLayout(verticalLayoutWidget_2);
         verticalLayout_4->setObjectName("verticalLayout_4");
         verticalLayout_4->setContentsMargins(0, 0, 0, 0);
@@ -247,6 +299,7 @@ public:
         lcdNumber->setObjectName("lcdNumber");
         lcdNumber->setMinimumSize(QSize(100, 0));
         lcdNumber->setMaximumSize(QSize(200, 16777215));
+        lcdNumber->setFrameShape(QFrame::Shape::NoFrame);
         lcdNumber->setDigitCount(3);
 
         horizontalLayout_2->addWidget(lcdNumber);
@@ -317,34 +370,31 @@ public:
         line->setFrameShadow(QFrame::Shadow::Sunken);
         verticalLayoutWidget_4 = new QWidget(Widget);
         verticalLayoutWidget_4->setObjectName("verticalLayoutWidget_4");
-        verticalLayoutWidget_4->setGeometry(QRect(350, 10, 551, 101));
+        verticalLayoutWidget_4->setGeometry(QRect(360, 10, 651, 101));
         verticalLayout_7 = new QVBoxLayout(verticalLayoutWidget_4);
         verticalLayout_7->setObjectName("verticalLayout_7");
         verticalLayout_7->setContentsMargins(0, 0, 0, 0);
         weatherinfoLabel = new QLabel(verticalLayoutWidget_4);
         weatherinfoLabel->setObjectName("weatherinfoLabel");
-        weatherinfoLabel->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
+        weatherinfoLabel->setAlignment(Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter);
 
         verticalLayout_7->addWidget(weatherinfoLabel);
 
         airInfoLabel = new QLabel(verticalLayoutWidget_4);
         airInfoLabel->setObjectName("airInfoLabel");
-        airInfoLabel->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
+        airInfoLabel->setAlignment(Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter);
 
         verticalLayout_7->addWidget(airInfoLabel);
 
         raininfoLabel = new QLabel(verticalLayoutWidget_4);
         raininfoLabel->setObjectName("raininfoLabel");
-        raininfoLabel->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
+        raininfoLabel->setAlignment(Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter);
 
         verticalLayout_7->addWidget(raininfoLabel);
 
         raininfoLabel->raise();
         airInfoLabel->raise();
         weatherinfoLabel->raise();
-        weatherimgLabel = new QLabel(Widget);
-        weatherimgLabel->setObjectName("weatherimgLabel");
-        weatherimgLabel->setGeometry(QRect(920, 20, 81, 81));
 
         retranslateUi(Widget);
 
@@ -365,9 +415,12 @@ public:
         label_6->setText(QCoreApplication::translate("Widget", "\302\260C", nullptr));
         label_7->setText(QCoreApplication::translate("Widget", "AQI", nullptr));
         raininfoLabel_2->setText(QCoreApplication::translate("Widget", "\351\231\215\346\260\264", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("Widget", "Calendar", nullptr));
-        vwButton->setText(QCoreApplication::translate("Widget", "Bilibili Live", nullptr));
-        label_4->setText(QCoreApplication::translate("Widget", "Bilibili Live", nullptr));
+        weatherimgLabel->setText(QCoreApplication::translate("Widget", "IMG", nullptr));
+        label_8->setText(QCoreApplication::translate("Widget", "\302\260C", nullptr));
+        label_9->setText(QCoreApplication::translate("Widget", "%", nullptr));
+        label_4->setText(QCoreApplication::translate("Widget", "\345\256\244\345\206\205Indoor", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("Widget", "Home", nullptr));
+        vwButton->setText(QCoreApplication::translate("Widget", "Extra APP 1", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_3), QCoreApplication::translate("Widget", "Extra", nullptr));
         todayButton->setText(QCoreApplication::translate("Widget", "Today", nullptr));
         label->setText(QCoreApplication::translate("Widget", "Temp", nullptr));
@@ -380,7 +433,6 @@ public:
         weatherinfoLabel->setText(QCoreApplication::translate("Widget", "\345\244\251\346\260\224", nullptr));
         airInfoLabel->setText(QCoreApplication::translate("Widget", "\347\251\272\346\260\224", nullptr));
         raininfoLabel->setText(QCoreApplication::translate("Widget", "\351\231\215\346\260\264", nullptr));
-        weatherimgLabel->setText(QCoreApplication::translate("Widget", "IMG", nullptr));
     } // retranslateUi
 
 };

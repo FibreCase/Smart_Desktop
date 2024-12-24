@@ -1,4 +1,4 @@
-QT       += core gui network charts svg
+QT       += core gui network charts svg #core5compat
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
