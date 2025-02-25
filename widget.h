@@ -73,6 +73,10 @@ private slots:
     void tempReadoutput();
     void loadReadoutput();
 
+    void on_pushButton_clicked();
+
+    void on_exitButton_clicked();
+
 private:
     Ui::Widget *ui;
     QTimer *timer1;

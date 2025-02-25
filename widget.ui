@@ -398,7 +398,7 @@
       <enum>QLCDNumber::SegmentStyle::Flat</enum>
      </property>
      <property name="value" stdset="0">
-      <double>20.199999999999999</double>
+      <double>20.000000000000000</double>
      </property>
      <property name="intValue" stdset="0">
       <number>20</number>
@@ -760,7 +760,7 @@
     <rect>
      <x>360</x>
      <y>10</y>
-     <width>651</width>
+     <width>601</width>
      <height>101</height>
     </rect>
    </property>
@@ -799,6 +799,19 @@
    <zorder>raininfoLabel</zorder>
    <zorder>airInfoLabel</zorder>
    <zorder>weatherinfoLabel</zorder>
+  </widget>
+  <widget class="QPushButton" name="exitButton">
+   <property name="geometry">
+    <rect>
+     <x>969</x>
+     <y>10</y>
+     <width>41</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>ESC</string>
+   </property>
   </widget>
  </widget>
  <resources/>

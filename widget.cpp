@@ -88,12 +88,18 @@ void Widget::on_refreshButton_clicked() {
     rainRequire();
     airRequire();
 }
+/** @brief vw界面按钮 */
 void Widget::on_vwButton_clicked()
 {
     VideoWidget *vw;
     vw = new VideoWidget(nullptr, this);
     vw->show();
     this->hide();
+}
+/** @brief 退出按钮 */
+void Widget::on_exitButton_clicked()
+{
+    QCoreApplication::quit();
 }
 
 // Timer Events
