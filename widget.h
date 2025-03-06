@@ -72,9 +72,6 @@ private slots:
     // Slots of Process
     void tempReadoutput();
     void loadReadoutput();
-
-    void on_pushButton_clicked();
-
     void on_exitButton_clicked();
 
 private:

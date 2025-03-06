@@ -216,8 +216,8 @@ void Widget::handleTcp30520Recive()
 void Widget::handleTcp30521ReciveWeather()
 {
 	QString msg = weatherSocket->readAll();
-	qDebug() << "[INFO] Tcp Recieve: " + msg;
-	QStringList weatherList = msg.split(" ");
+    // qDebug() << "[INFO] Tcp Recieve: " + msg;
+    QStringList weatherList = msg.split(" ");
 	QString weatherType = weatherList[0];
 	QString temperature = weatherList[1];
 	QString humidity = weatherList[2];
@@ -254,7 +254,7 @@ void Widget::handleTcp30521ReciveWeather()
 void Widget::handleTcp30521ReciveRain()
 {
 	QString msg = rainSocket->readAll();
-	qDebug() << "[INFO] Tcp Recieve: " + msg;
+    // qDebug() << "[INFO] Tcp Recieve: " + msg;
     // 降水信息显示
     if (msg.left(msg.size() - 1) == "未来两小时无降水") {
         ui->raininfoLabel_2->setStyleSheet("background-color: transparent;");
@@ -269,8 +269,8 @@ void Widget::handleTcp30521ReciveRain()
 void Widget::handleTcp30521ReciveAir()
 {
 	QString msg = airSocket->readAll();
-	qDebug() << "[INFO] Tcp Recieve: " + msg;
-	QStringList airList = msg.split(" ");
+    // qDebug() << "[INFO] Tcp Recieve: " + msg;
+    QStringList airList = msg.split(" ");
 	QString airQuality = airList[0];
 	int airAQI = airList[1].toInt();
 	QString primary = airList[2];
@@ -299,7 +299,7 @@ void Widget::handleTcp30521ReciveAir()
 void Widget::handleTcp30521ReciveIndoor()
 {
     QString msg = indoorSocket->readAll();
-    qDebug() << "[INFO] Tcp Recieve: " + msg;
+    // qDebug() << "[INFO] Tcp Recieve: " + msg;
     QStringList indoorList = msg.split(" ");
     float indoorTemp = indoorList[0].toFloat();
     int indoorHumi = indoorList[1].toInt();
@@ -336,7 +336,7 @@ void Widget::acceptTcp30522()
     connect(socket, &QTcpSocket::readyRead, this, &Widget::handleTcp30522Recive);
     imageBuffer.clear();
     imageSize = 0;
-    qDebug() << "New Connection. ";
+    // qDebug() << "New Connection. ";
 }
 /** @brief 处理TCP30522接收 */
 void Widget::handleTcp30522Recive()
@@ -408,7 +408,7 @@ void Widget::weatherRequire() {
     weatherSocket->connectToHost(QHostAddress(WEATHERSERVERIP), 30521);
     connect(weatherSocket, &QTcpSocket::readyRead, this, &Widget::handleTcp30521ReciveWeather);
     weatherSocket->write(QString("weather").toUtf8());
-    qDebug() << "[INFO] Weather required!";
+    // qDebug() << "[INFO] Weather required!";
 }
 /** @brief 请求雨情 */
 void Widget::rainRequire()
@@ -417,7 +417,7 @@ void Widget::rainRequire()
 	rainSocket->connectToHost(QHostAddress(WEATHERSERVERIP), 30521);
 	connect(rainSocket, &QTcpSocket::readyRead, this, &Widget::handleTcp30521ReciveRain);
 	rainSocket->write(QString("rain").toUtf8());
-	qDebug() << "[INFO] Rain required!";
+    // qDebug() << "[INFO] Rain required!";
 }
 /** @brief 请求空气质量 */
 void Widget::airRequire()
@@ -426,7 +426,7 @@ void Widget::airRequire()
 	airSocket->connectToHost(QHostAddress(WEATHERSERVERIP), 30521);
 	connect(airSocket, &QTcpSocket::readyRead, this, &Widget::handleTcp30521ReciveAir);
 	airSocket->write(QString("air").toUtf8());
-	qDebug() << "[INFO] Air required!";
+    // qDebug() << "[INFO] Air required!";
 }
 /** @brief 请求室内 */
 void Widget::indoorRequire()
@@ -435,7 +435,7 @@ void Widget::indoorRequire()
     indoorSocket->connectToHost(QHostAddress(WEATHERSERVERIP), 30521);
     connect(indoorSocket, &QTcpSocket::readyRead, this, &Widget::handleTcp30521ReciveIndoor);
     indoorSocket->write(QString("indoor").toUtf8());
-    qDebug() << "[INFO] Indoor required!";
+    // qDebug() << "[INFO] Indoor required!";
 }
 /** @brief 更新天气图片 */
 void Widget::weatherImgUpdate(int code)

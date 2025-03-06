@@ -177,7 +177,7 @@
       <enum>QLCDNumber::SegmentStyle::Flat</enum>
      </property>
      <property name="intValue" stdset="0">
-      <number>50</number>
+      <number>99</number>
      </property>
     </widget>
     <widget class="QLCDNumber" name="tempLcdNumber">
@@ -199,7 +199,7 @@
       <enum>QLCDNumber::SegmentStyle::Flat</enum>
      </property>
      <property name="intValue" stdset="0">
-      <number>16</number>
+      <number>-99</number>
      </property>
     </widget>
     <widget class="QPushButton" name="refreshButton">
@@ -284,7 +284,7 @@
       <enum>QLCDNumber::SegmentStyle::Flat</enum>
      </property>
      <property name="intValue" stdset="0">
-      <number>120</number>
+      <number>999</number>
      </property>
     </widget>
     <widget class="QLabel" name="label_7">
@@ -325,7 +325,7 @@
       </font>
      </property>
      <property name="text">
-      <string>降水</string>
+      <string>降水 - 故障</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -357,7 +357,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>IMG</string>
+      <string>IMG - E</string>
      </property>
     </widget>
     <widget class="Line" name="line_3">
@@ -398,10 +398,10 @@
       <enum>QLCDNumber::SegmentStyle::Flat</enum>
      </property>
      <property name="value" stdset="0">
-      <double>20.000000000000000</double>
+      <double>-99.000000000000000</double>
      </property>
      <property name="intValue" stdset="0">
-      <number>20</number>
+      <number>-99</number>
      </property>
     </widget>
     <widget class="QLabel" name="label_8">
@@ -445,7 +445,10 @@
       <enum>QLCDNumber::SegmentStyle::Flat</enum>
      </property>
      <property name="value" stdset="0">
-      <double>40.000000000000000</double>
+      <double>99.000000000000000</double>
+     </property>
+     <property name="intValue" stdset="0">
+      <number>99</number>
      </property>
     </widget>
     <widget class="QLabel" name="label_9">
@@ -768,7 +771,7 @@
     <item>
      <widget class="QLabel" name="weatherinfoLabel">
       <property name="text">
-       <string>天气</string>
+       <string>天气 - 故障</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
@@ -778,7 +781,7 @@
     <item>
      <widget class="QLabel" name="airInfoLabel">
       <property name="text">
-       <string>空气</string>
+       <string>空气 - 故障</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
@@ -788,7 +791,7 @@
     <item>
      <widget class="QLabel" name="raininfoLabel">
       <property name="text">
-       <string>降水</string>
+       <string>降水 - 故障</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
